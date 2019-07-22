@@ -30,10 +30,23 @@
 
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'package:flutter/painting.dart';
 
+import 'package:flutter/painting.dart';
+import 'package:steppe_up/model/line_info.dart';
+import 'package:steppe_up/model/text_run.dart';
+import 'package:steppe_up/model/vertical_paragraph_constraints.dart';
+import 'package:steppe_up/util/line_breaker.dart';
+
+/// This class contains the core logic to layout and paint text in vertical
+/// lines which wrap from left to right. It is based on the idea of the Flutter
+/// Paragraph class, but since that class is just a wrapper for the underlying
+/// LibTxt library, the content of this class is much different. This class
+/// breaks a string of text into one word text runs, measures them using the
+/// Flutter Paragraph class, calculates how many words to use in each line, and
+/// finally paints each line one word at a time rotated so that the words form
+/// vertical columns. This is the standard way to orient Mongolian text.
 class VerticalParagraph {
-  VerticalParagraph._(this._paragraphStyle, this._textStyle, this._text);
+  VerticalParagraph(this._paragraphStyle, this._textStyle, this._text);
 
   ui.ParagraphStyle _paragraphStyle;
   ui.TextStyle _textStyle;
@@ -63,11 +76,14 @@ class VerticalParagraph {
     _calculateLineBreaks(height);
     _calculateWidth();
     _height = height;
-    _calculateIntrinsicSize();
+    _calculateIntrinsicHeight();
   }
 
   List<TextRun> _runs = [];
 
+  /// Runs are short substrings of text. A line breaker is used to determine
+  /// where one run ends and the next one starts. In this case, the break
+  /// location is after a space and before a non-space.
   void _calculateRuns() {
     if (_runs.isNotEmpty) {
       return;
@@ -91,6 +107,8 @@ class VerticalParagraph {
     }
   }
 
+  /// The run contains a reference to a Paragraph object, which we will use to
+  /// get the size of the word in the run.
   void _addRun(int start, int end) {
     final builder = ui.ParagraphBuilder(_paragraphStyle)
       ..pushStyle(_textStyle)
@@ -103,8 +121,13 @@ class VerticalParagraph {
 
   List<LineInfo> _lines = [];
 
+  /// Once we know the size of all of the words, that is, every text run, we can
+  /// see how many will fit in a line given the [maxLineLength] constraint. The
+  /// run index for the run at the start and end of the line is stored in an
+  /// array that we can come back to when we are ready to paint. At this point
+  /// the lines have not yet been rotated, so width and height here refer to the
+  /// size of the line in horizontal orientation.
   void _calculateLineBreaks(double maxLineLength) {
-    assert(_runs != null);
     if (_runs.isEmpty) {
       return;
     }
@@ -143,9 +166,9 @@ class VerticalParagraph {
     _lines.add(lineInfo);
   }
 
+  /// The width of the paragraph is the sum of the line heights (since the lines
+  /// will be rotated when they are painted).
   void _calculateWidth() {
-    assert(_lines != null);
-    assert(_runs != null);
     double sum = 0;
     for (LineInfo line in _lines) {
       sum += line.bounds.height;
@@ -153,12 +176,13 @@ class VerticalParagraph {
     _width = sum;
   }
 
-  void _calculateIntrinsicSize() {
-    assert(_runs != null);
+  /// This is how tall the paragraph would like to be (in vertical text
+  /// orientation) if it had as much space as it wanted.
+  void _calculateIntrinsicHeight() {
     double sum = 0;
     double minRunWidth = double.infinity;
     for (TextRun run in _runs) {
-      final width = run.paragraph.width;
+      final width = run.paragraph.longestLine;
       minRunWidth = math.min(width, minRunWidth);
       sum += width;
     }
@@ -166,18 +190,28 @@ class VerticalParagraph {
     _maxIntrinsicHeight = sum;
   }
 
+  /// Once the runs have been measured and the lines breaks calculated, we can
+  /// draw the text in vertical lines.
   void draw(Canvas canvas, Offset offset) {
-    assert(_lines != null);
-    assert(_runs != null);
-
     canvas.save();
+
+    // Move to the start location.
     canvas.translate(offset.dx, offset.dy);
+
+    // Rotate the canvas 90 degrees
     canvas.rotate(math.pi / 2);
 
+    // Draw each line one at a time.
     for (LineInfo line in _lines) {
+
+      // Move to where the line should start.
       canvas.translate(0, -line.bounds.height);
+
+      // Draw each run (word) one at a time.
       double dx = 0;
       for (int i = line.textRunStart; i < line.textRunEnd; i++) {
+
+        // Draw the run. The offset is the location of the run on the line.
         canvas.drawParagraph(_runs[i].paragraph, Offset(dx, 0));
         dx += _runs[i].paragraph.longestLine;
       }
@@ -185,121 +219,4 @@ class VerticalParagraph {
 
     canvas.restore();
   }
-}
-
-// This class is adapted from Flutter's ParagraphConstraints
-class VerticalParagraphConstraints {
-  const VerticalParagraphConstraints({
-    this.height,
-  }) : assert(height != null);
-
-  final double height;
-
-  @override
-  bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType) return false;
-    final VerticalParagraphConstraints typedOther = other;
-    return typedOther.height == height;
-  }
-
-  @override
-  int get hashCode => height.hashCode;
-
-  @override
-  String toString() => '$runtimeType(height: $height)';
-}
-
-// This class is adapted from Flutter's ParagraphBuilder
-class VerticalParagraphBuilder {
-  VerticalParagraphBuilder(ui.ParagraphStyle style) {
-    _paragraphStyle = style;
-  }
-
-  ui.ParagraphStyle _paragraphStyle;
-  ui.TextStyle _textStyle;
-  String _text = '';
-
-  static final _defaultParagraphStyle = ui.ParagraphStyle(
-    textAlign: TextAlign.start,
-    textDirection: TextDirection.ltr,
-    fontSize: 30,
-  );
-
-  static final _defaultTextStyle = ui.TextStyle(
-    color: Color(0xFF000000),
-    textBaseline: TextBaseline.alphabetic,
-    fontSize: 30,
-  );
-
-  set textStyle(TextStyle style) {
-    _textStyle = style.getTextStyle();
-  }
-
-  set text(String text) {
-    _text = text;
-  }
-
-  VerticalParagraph build() {
-    assert(_text != null);
-    if (_paragraphStyle == null) {
-      _paragraphStyle = _defaultParagraphStyle;
-    }
-    if (_textStyle == null) {
-      _textStyle = _defaultTextStyle;
-    }
-    return VerticalParagraph._(_paragraphStyle, _textStyle, _text);
-  }
-}
-
-class LineBreaker {
-  String _text;
-  List<int> _breaks;
-
-  set text(String text) {
-    if (text == _text) {
-      return;
-    }
-    _text = text;
-    _breaks = null;
-  }
-
-  // returns the number of breaks
-  int computeBreaks() {
-    assert(_text != null);
-
-    if (_breaks != null) {
-      return _breaks.length;
-    }
-    _breaks = [];
-
-    for (int i = 1; i < _text.length; i++) {
-      if (isBreakChar(_text[i - 1]) && !isBreakChar(_text[i])) {
-        _breaks.add(i);
-      }
-    }
-
-    return _breaks.length;
-  }
-
-  List<int> get breaks => _breaks;
-
-  bool isBreakChar(String codeUnit) {
-    return codeUnit == ' ';
-  }
-}
-
-class TextRun {
-  TextRun(this.start, this.end, this.paragraph);
-
-  int start;
-  int end;
-  ui.Paragraph paragraph;
-}
-
-class LineInfo {
-  LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
-
-  int textRunStart;
-  int textRunEnd;
-  Rect bounds;
 }

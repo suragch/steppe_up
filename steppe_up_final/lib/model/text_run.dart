@@ -28,11 +28,16 @@
  * THE SOFTWARE.
  */
 
-class Strings {
-  static const String appTitle = "Steppe Up";
-  // The welcome message literally means "Please come to my wide and vast
-  // grassland." It sounds better in Mongolian than it does in English.
-  static const String mongolianWelcomeText =
-      'ᠤᠷᠭᠡᠨ ᠠᠭᠤᠳᠠᠮ ᠲᠠᠯ᠎ᠠ ᠨᠤᠲᠤᠭ ᠲᠤ ᠮᠢᠨᠢ ᠬᠦᠷᠦᠯᠴᠡᠨ ᠢᠷᠡᠭᠡᠷᠡᠢ';
-  static const String travelMongolia = 'TRAVEL MONGOLIA';
+import 'dart:ui' as ui show Paragraph;
+
+/// A text run is a substring where [start] and [end] determine the range. In
+/// this tutorial the substring is a word with its following space character.
+/// The [paragraph] is used to get the size metrics of the run so that words
+/// can be laid out in lines, which are subsequently laid out in a paragraph.
+class TextRun {
+  TextRun(this.start, this.end, this.paragraph);
+
+  int start;
+  int end;
+  ui.Paragraph paragraph;
 }

@@ -28,37 +28,19 @@
  * THE SOFTWARE.
  */
 
-import 'package:flutter/widgets.dart';
-import 'package:steppe_up/vertical_text_painter.dart';
+import 'package:flutter/rendering.dart';
+import 'package:steppe_up/dartui/vertical_text_painter.dart';
 
-// This class was adapted from the Flutter RichText widget
-class VerticalText extends LeafRenderObjectWidget {
-
-  const VerticalText({
-    Key key,
-    this.text,
-  })  : assert(text != null),
-        super(key: key);
-
-  final TextSpan text;
-
-  @override
-  RenderVerticalText createRenderObject(BuildContext context) {
-    return RenderVerticalText(text);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderVerticalText renderObject) {
-    renderObject.text = text;
-  }
-}
-
-// This class was adapted from the Flutter RenderParagraph class
+/// [RenderVerticalText] is the [RenderObject[ backing the [VerticalText] widget.
+///
+/// This class is adapted from Flutter's [RenderParagraph], but the underlying
+/// logic here lays out and paints the text in vertical lines which wrap from
+/// left to right. Most of the extra parameters and functionality in
+/// [RenderParagraph] have been removed for the sake of simplicity. Consult the
+/// Flutter source code for that class to add them in as needed.
 class RenderVerticalText extends RenderBox {
-
   RenderVerticalText(TextSpan text)
-      : assert(text != null),
-        _textPainter = VerticalTextPainter(text: text);
+      : _textPainter = VerticalTextPainter(text: text);
 
   final VerticalTextPainter _textPainter;
 
@@ -145,7 +127,6 @@ class RenderVerticalText extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _layoutTextWithConstraints(constraints);
     _textPainter.paint(context.canvas, offset);
   }
 }

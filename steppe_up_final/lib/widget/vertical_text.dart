@@ -28,11 +28,32 @@
  * THE SOFTWARE.
  */
 
-class Strings {
-  static const String appTitle = "Steppe Up";
-  // The welcome message literally means "Please come to my wide and vast
-  // grassland." It sounds better in Mongolian than it does in English.
-  static const String mongolianWelcomeText =
-      'ᠤᠷᠭᠡᠨ ᠠᠭᠤᠳᠠᠮ ᠲᠠᠯ᠎ᠠ ᠨᠤᠲᠤᠭ ᠲᠤ ᠮᠢᠨᠢ ᠬᠦᠷᠦᠯᠴᠡᠨ ᠢᠷᠡᠭᠡᠷᠡᠢ';
-  static const String travelMongolia = 'TRAVEL MONGOLIA';
+import 'package:flutter/widgets.dart';
+import 'package:steppe_up/widget/render_vertical_text.dart';
+
+/// A widget that displays text in vertical lines which wrap from left to right.
+///
+/// The text string and style are passed in with the [text] argument as a
+/// [TextSpan]. The current implementation only uses the top level text and style
+/// in the TextSpan. Any children in the TextSpan are ignored. Thus this widget
+/// behaves similarly to the Flutter [Text] widget, even though it takes a
+/// TextSpan like a [RichText] widget.
+class VerticalText extends LeafRenderObjectWidget {
+  const VerticalText({
+    Key key,
+    this.text,
+  }) : super(key: key);
+
+  final TextSpan text;
+
+  @override
+  RenderVerticalText createRenderObject(BuildContext context) {
+    return RenderVerticalText(text);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, RenderVerticalText renderObject) {
+    renderObject.text = text;
+  }
 }

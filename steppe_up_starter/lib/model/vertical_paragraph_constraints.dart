@@ -28,11 +28,14 @@
  * THE SOFTWARE.
  */
 
-class Strings {
-  static const String appTitle = "Steppe Up";
-  // The welcome message literally means "Please come to my wide and vast
-  // grassland." It sounds better in Mongolian than it does in English.
-  static const String mongolianWelcomeText =
-      'ᠤᠷᠭᠡᠨ ᠠᠭᠤᠳᠠᠮ ᠲᠠᠯ᠎ᠠ ᠨᠤᠲᠤᠭ ᠲᠤ ᠮᠢᠨᠢ ᠬᠦᠷᠦᠯᠴᠡᠨ ᠢᠷᠡᠭᠡᠷᠡᠢ';
-  static const String travelMongolia = 'TRAVEL MONGOLIA';
+/// This class is comparable to Flutter's ParagraphConstraints, which takes a
+/// width instead of height since it assumes a horizontal orientation.
+///
+/// The [height] is passed in and then the paragraph will let the system know
+/// what its width needs to be for this height after it measures its text laid
+/// out in vertical lines.
+class VerticalParagraphConstraints {
+  const VerticalParagraphConstraints({this.height});
+
+  final double height;
 }

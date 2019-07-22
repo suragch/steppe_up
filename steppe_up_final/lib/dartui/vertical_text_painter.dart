@@ -28,16 +28,22 @@
  * THE SOFTWARE.
  */
 
-import 'dart:ui' as ui show ParagraphStyle;
 import 'package:flutter/painting.dart';
-import 'package:steppe_up/vertical_paragraph.dart';
+import 'package:steppe_up/dartui/vertical_paragraph.dart';
+import 'package:steppe_up/dartui/vertical_paragraph_builder.dart';
+import 'package:steppe_up/model/vertical_paragraph_constraints.dart';
 
-// This class was adapted from the Flutter TextPainter class.
+/// This class was adapted from the Flutter [TextPainter] class, which assumed
+/// assumed a horizontal paragraph orientation and layout. It adds a layer of
+/// abstraction between the widget/render object layer and the dart:ui layer.
+/// The actual layout and painting is still done at the dart:ui layer.
+///
+/// Check out the standard [TextPainter] source code comments for the meaning of
+/// the methods. Since this is for a paragraph with vertical lines, I've
+/// switched the meaning of width and height. I also removed most of the
+/// original parameters. Other differences I've added comments below.
 class VerticalTextPainter {
-  VerticalTextPainter({
-    TextSpan text,
-  })  : assert(text != null),
-        _text = text;
+  VerticalTextPainter({TextSpan text}) : _text = text;
 
   VerticalParagraph _paragraph;
   bool _needsLayout = true;
@@ -46,21 +52,10 @@ class VerticalTextPainter {
   TextSpan _text;
 
   set text(TextSpan value) {
-    assert(value == null || value.debugAssertIsValid());
     if (_text == value) return;
     _text = value;
     _paragraph = null;
     _needsLayout = true;
-  }
-
-  ui.ParagraphStyle _createParagraphStyle() {
-    return ui.ParagraphStyle(
-      textAlign: TextAlign.start,
-      textDirection: TextDirection.ltr,
-      maxLines: null,
-      ellipsis: null,
-      locale: null,
-    );
   }
 
   double _applyFloatingPointHack(double layoutValue) {
@@ -68,27 +63,22 @@ class VerticalTextPainter {
   }
 
   double get minIntrinsicHeight {
-    assert(!_needsLayout);
     return _applyFloatingPointHack(_paragraph.minIntrinsicHeight);
   }
 
   double get maxIntrinsicHeight {
-    assert(!_needsLayout);
     return _applyFloatingPointHack(_paragraph.maxIntrinsicHeight);
   }
 
   double get width {
-    assert(!_needsLayout);
     return _applyFloatingPointHack(_paragraph.width);
   }
 
   double get height {
-    assert(!_needsLayout);
     return _applyFloatingPointHack(_paragraph.height);
   }
 
   Size get size {
-    assert(!_needsLayout);
     return Size(width, height);
   }
 
@@ -96,14 +86,14 @@ class VerticalTextPainter {
   double _lastMaxHeight;
 
   void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {
-    assert(text != null);
     if (!_needsLayout &&
         minHeight == _lastMinHeight &&
         maxHeight == _lastMaxHeight) return;
     _needsLayout = false;
     if (_paragraph == null) {
-      final VerticalParagraphBuilder builder =
-          VerticalParagraphBuilder(_createParagraphStyle());
+      // Passing in null here will cause the [VerticalParagraphBuilder] to
+      // use a default paragraph style.
+      final VerticalParagraphBuilder builder = VerticalParagraphBuilder(null);
       _applyTextSpan(builder, _text);
       _paragraph = builder.build();
     }
@@ -117,7 +107,10 @@ class VerticalTextPainter {
     }
   }
 
-  // Ingnoring TextSpan children in this implementation. See TextSpan.build()
+  /// Ignoring [TextSpan] children in this implementation. This method replaces
+  /// TextSpan.build() since that method needs a horizontal [ParagraphBuilder].
+  /// A more robust implementation show add the spans and text from the
+  /// children recursively.
   void _applyTextSpan(VerticalParagraphBuilder builder, TextSpan textSpan) {
     final style = textSpan.style;
     final text = textSpan.text;
@@ -130,6 +123,8 @@ class VerticalTextPainter {
     }
   }
 
+  /// Painting was moved to the VerticalParagraph since Canvas.drawParagraph
+  /// assumes a horizontal layout.
   void paint(Canvas canvas, Offset offset) {
     _paragraph.draw(canvas, offset);
   }

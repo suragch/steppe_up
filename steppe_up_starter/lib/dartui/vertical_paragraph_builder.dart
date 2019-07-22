@@ -28,11 +28,57 @@
  * THE SOFTWARE.
  */
 
-class Strings {
-  static const String appTitle = "Steppe Up";
-  // The welcome message literally means "Please come to my wide and vast
-  // grassland." It sounds better in Mongolian than it does in English.
-  static const String mongolianWelcomeText =
-      'ᠤᠷᠭᠡᠨ ᠠᠭᠤᠳᠠᠮ ᠲᠠᠯ᠎ᠠ ᠨᠤᠲᠤᠭ ᠲᠤ ᠮᠢᠨᠢ ᠬᠦᠷᠦᠯᠴᠡᠨ ᠢᠷᠡᠭᠡᠷᠡᠢ';
-  static const String travelMongolia = 'TRAVEL MONGOLIA';
+import 'dart:ui' as ui;
+
+import 'package:flutter/painting.dart';
+import 'package:steppe_up/dartui/vertical_paragraph.dart';
+
+///  This class is adapted from Flutter's [ParagraphBuilder]. You should use it
+///  to create a VerticalParagraph rather than creating one directly yourself.
+///  If the ParagraphStyle that is passed in is null, then a default style will
+///  be used.
+///
+///  The original implementation of ParagraphBuilder uses a stack of styles
+///  to build up the overall paragraph style. However, rather than pushing and
+///  popping styles and adding text, I have implemented simple set methods for
+///  [text] and [textStyle]. This means that a paragraph cannot contain multiple
+///  styles.
+class VerticalParagraphBuilder {
+  VerticalParagraphBuilder(ui.ParagraphStyle style) {
+    _paragraphStyle = style;
+  }
+
+  ui.ParagraphStyle _paragraphStyle;
+  ui.TextStyle _textStyle;
+  String _text = '';
+
+  static final _defaultParagraphStyle = ui.ParagraphStyle(
+    textAlign: TextAlign.left,
+    textDirection: TextDirection.ltr,
+    fontSize: 30,
+  );
+
+  static final _defaultTextStyle = ui.TextStyle(
+    color: Color(0xFF000000), // opaque black
+    textBaseline: ui.TextBaseline.alphabetic,
+    fontSize: 30,
+  );
+
+  set textStyle(TextStyle style) {
+    _textStyle = style.getTextStyle();
+  }
+
+  set text(String text) {
+    _text = text;
+  }
+
+  VerticalParagraph build() {
+    if (_paragraphStyle == null) {
+      _paragraphStyle = _defaultParagraphStyle;
+    }
+    if (_textStyle == null) {
+      _textStyle = _defaultTextStyle;
+    }
+    return VerticalParagraph(_paragraphStyle, _textStyle, _text);
+  }
 }

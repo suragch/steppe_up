@@ -30,7 +30,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:steppe_up/strings.dart';
-import 'package:steppe_up/vertical_text_widget.dart';
+import 'package:steppe_up/widget/vertical_text.dart';
 
 void main() => runApp(MyApp());
 

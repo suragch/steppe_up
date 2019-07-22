@@ -28,11 +28,19 @@
  * THE SOFTWARE.
  */
 
-class Strings {
-  static const String appTitle = "Steppe Up";
-  // The welcome message literally means "Please come to my wide and vast
-  // grassland." It sounds better in Mongolian than it does in English.
-  static const String mongolianWelcomeText =
-      'ᠤᠷᠭᠡᠨ ᠠᠭᠤᠳᠠᠮ ᠲᠠᠯ᠎ᠠ ᠨᠤᠲᠤᠭ ᠲᠤ ᠮᠢᠨᠢ ᠬᠦᠷᠦᠯᠴᠡᠨ ᠢᠷᠡᠭᠡᠷᠡᠢ';
-  static const String travelMongolia = 'TRAVEL MONGOLIA';
+import 'dart:ui';
+
+/// This class contains the information needed to layout lines of text at
+/// the correct location in the paragraph. The [textRunStart] is the string
+/// index for the start of the line and the [textRunEnd] is the string index
+/// of the end of the line. The [bounds] is the measured size of the line.
+///
+/// The bounds width and height assumes a horizontal text line, that is, one
+/// that has not yet been rotated for lines in a vertical paragraph.
+class LineInfo {
+  LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
+
+  int textRunStart;
+  int textRunEnd;
+  Rect bounds;
 }

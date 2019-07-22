@@ -28,12 +28,14 @@
  * THE SOFTWARE.
  */
 
-import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'package:flutter/painting.dart';
 
+import 'package:flutter/painting.dart';
+import 'package:steppe_up/model/vertical_paragraph_constraints.dart';
+
+// TODO: Refer to the tutorial for directions to complete this class.
 class VerticalParagraph {
-  VerticalParagraph._(this._paragraphStyle, this._textStyle, this._text);
+  VerticalParagraph(this._paragraphStyle, this._textStyle, this._text);
 
   ui.ParagraphStyle _paragraphStyle;
   ui.TextStyle _textStyle;
@@ -63,90 +65,26 @@ class VerticalParagraph {
     _calculateLineBreaks(height);
     _calculateWidth();
     _height = height;
-    _calculateIntrinsicSize();
+    _calculateIntrinsicHeight();
   }
 
   void _calculateRuns() {
-
+    // TODO
   }
 
   void _calculateLineBreaks(double maxLineLength) {
-
+    // TODO
   }
 
   void _calculateWidth() {
-
+    // TODO
   }
 
-  void _calculateIntrinsicSize() {
-
+  void _calculateIntrinsicHeight() {
+    // TODO
   }
 
   void draw(Canvas canvas, Offset offset) {
-
-  }
-}
-
-// This class is adapted from Flutter's ParagraphConstraints
-class VerticalParagraphConstraints {
-  const VerticalParagraphConstraints({
-    this.height,
-  }) : assert(height != null);
-
-  final double height;
-
-  @override
-  bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType) return false;
-    final VerticalParagraphConstraints typedOther = other;
-    return typedOther.height == height;
-  }
-
-  @override
-  int get hashCode => height.hashCode;
-
-  @override
-  String toString() => '$runtimeType(height: $height)';
-}
-
-// This class is adapted from Flutter's ParagraphBuilder
-class VerticalParagraphBuilder {
-  VerticalParagraphBuilder(ui.ParagraphStyle style) {
-    _paragraphStyle = style;
-  }
-
-  ui.ParagraphStyle _paragraphStyle;
-  ui.TextStyle _textStyle;
-  String _text = '';
-
-  static final _defaultParagraphStyle = ui.ParagraphStyle(
-    textAlign: TextAlign.start,
-    textDirection: TextDirection.ltr,
-    fontSize: 30,
-  );
-
-  static final _defaultTextStyle = ui.TextStyle(
-    color: Color(0xFF000000),
-    textBaseline: TextBaseline.alphabetic,
-    fontSize: 30,
-  );
-
-  set textStyle(TextStyle style) {
-    _textStyle = style.getTextStyle();
-  }
-
-  set text(String text) {
-    _text = text;
-  }
-
-  VerticalParagraph build() {
-    assert(_text != null);
-    if (_paragraphStyle == null) {
-      _paragraphStyle = _defaultParagraphStyle;
-    }
-    if (_textStyle == null) {
-      _textStyle = _defaultTextStyle;
-    }
-    return VerticalParagraph._(_paragraphStyle, _textStyle, _text);
+    // TODO
   }
 }
