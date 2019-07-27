@@ -28,10 +28,12 @@
  * THE SOFTWARE.
  */
 
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/painting.dart';
 import 'package:steppe_up/model/vertical_paragraph_constraints.dart';
+import 'package:steppe_up/util/line_breaker.dart';
 
 // TODO: Refer to the tutorial for directions to complete this class.
 class VerticalParagraph {

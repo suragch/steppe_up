@@ -95,7 +95,7 @@ class BodyWidget extends StatelessWidget {
     return SafeArea(
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: Text(
+        child: Text(  // TODO: Start your journey here
           Strings.travelMongolia,
           style: TextStyle(
             color: Colors.white70,

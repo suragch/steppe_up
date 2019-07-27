@@ -77,6 +77,10 @@ class VerticalParagraph {
     _calculateWidth();
     _height = height;
     _calculateIntrinsicHeight();
+    print("There are ${_runs.length} runs.");
+    print("There are ${_lines.length} lines.");
+    print("width=$width height=$height");
+    print("min=$minIntrinsicHeight max=$maxIntrinsicHeight");
   }
 
   List<TextRun> _runs = [];
@@ -176,17 +180,17 @@ class VerticalParagraph {
     _width = sum;
   }
 
-  /// This is how tall the paragraph would like to be (in vertical text
-  /// orientation) if it had as much space as it wanted.
+  /// This is the range of how tall the paragraph is willing to be (in vertical
+  /// text orientation) based on its content.
   void _calculateIntrinsicHeight() {
     double sum = 0;
-    double minRunWidth = double.infinity;
+    double maxRunWidth = 0;
     for (TextRun run in _runs) {
-      final width = run.paragraph.longestLine;
-      minRunWidth = math.min(width, minRunWidth);
+      final width = run.paragraph.maxIntrinsicWidth;
+      maxRunWidth = math.max(width, maxRunWidth);
       sum += width;
     }
-    _minIntrinsicHeight = minRunWidth;
+    _minIntrinsicHeight = maxRunWidth;
     _maxIntrinsicHeight = sum;
   }
 
