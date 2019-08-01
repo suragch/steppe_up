@@ -43,10 +43,10 @@ class VerticalParagraph {
   ui.TextStyle _textStyle;
   String _text;
 
-  double _width;
-  double _height;
-  double _minIntrinsicHeight;
-  double _maxIntrinsicHeight;
+  double _width = 0;
+  double _height = 0;
+  double _minIntrinsicHeight = 0;
+  double _maxIntrinsicHeight = 0;
 
   double get width => _width;
 
